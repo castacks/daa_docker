@@ -5,9 +5,10 @@ FROM ${base_image}
 # Allow using GUI apps.
 # ENV TERM=xterm
 ARG DEBIAN_FRONTEND=noninteractive
+ARG T_ZONE=New_York
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata \
- && ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime \
+ && ln -fs /usr/share/zoneinfo/America/${T_ZONE} /etc/localtime \
  && dpkg-reconfigure --frontend noninteractive tzdata \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
