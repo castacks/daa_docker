@@ -23,10 +23,14 @@ RUN apt-get update \
 
 RUN pip3 install --no-cache-dir \
 	numpy==1.20.3 \
+	scikit-image \
 	timm \
 	seaborn \
 	geographiclib \
 	filterpy
-	
+
+# Refer to https://forums.developer.nvidia.com/t/error-importerror-usr-lib-aarch64-linux-gnu-libgomp-so-1-cannot-allocate-memory-in-static-tls-block-i-looked-through-available-threads-already/166494/5
+ENV LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0
+
 # Entrypoint command
 CMD /bin/bash
