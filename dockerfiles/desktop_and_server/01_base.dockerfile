@@ -1,4 +1,4 @@
-ARG base_image=nvcr.io/nvidia/pytorch:22.10-py3
+ARG base_image=nvcr.io/nvidia/pytorch:22.12-py3
 FROM ${base_image}
 
 # Allow using GUI apps.
@@ -23,7 +23,8 @@ RUN pip3 install --no-cache-dir \
 	timm \
 	seaborn \
 	geographiclib \
-	filterpy
+	filterpy \
+	wandb
 	
 # Entrypoint command
 CMD /bin/bash
