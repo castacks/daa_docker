@@ -1,6 +1,16 @@
 
 # Docker for DAA #
 
+- [Docker for DAA](#docker-for-daa)
+- [Introduction](#introduction)
+- [Pre-built images](#pre-built-images)
+- [Scripts for creating docker containers](#scripts-for-creating-docker-containers)
+- [Adding the host user to an image](#adding-the-host-user-to-an-image)
+- [Building images locally](#building-images-locally)
+- [Remove a series of images based on NGC version](#remove-a-series-of-images-based-on-ngc-version)
+- [Who to talk to](#who-to-talk-to)
+  - [Point of contact:](#point-of-contact)
+
 # Introduction #
 
 This repo contains the useful docker files and scripts for the Aircraft Detecion and Avoidance project. You can find pre-built docker images, docker files, and helper scripts here. The docker usage targets both x86 (ordinary desktop CPU/GPU) and arm (aarch64, Jetson platforms) architectures.
