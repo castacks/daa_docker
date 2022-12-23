@@ -15,29 +15,29 @@ echo "============================================================"
 echo ""
 
 # Build the images in order.
-# echo "${ECHO_PREFIX} Building 01_base..."
-# echo ""
+echo "${ECHO_PREFIX} Building 01_base..."
+echo ""
 
-# ./build_docker_image.sh \
-#     desktop_and_jetson/01_base.dockerfile \
-#     ${DOCKERHUB_ACCOUNT} \
-#     ${PLATFORM} \
-#     ${NGC_VERSION} \
-#     py3 \
-#     01_base \
-#     -b nvcr.io/nvidia/pytorch:${NGC_VERSION}-py3
+./build_docker_image.sh \
+    desktop_and_jetson/01_base.dockerfile \
+    ${DOCKERHUB_ACCOUNT} \
+    ${PLATFORM} \
+    ${NGC_VERSION} \
+    py3 \
+    01_base \
+    -b nvcr.io/nvidia/pytorch:${NGC_VERSION}-py3
 
-# echo ""
-# echo "${ECHO_PREFIX} Building 02_scikit..."
-# echo ""
+echo ""
+echo "${ECHO_PREFIX} Building 02_scikit..."
+echo ""
 
-# ./build_docker_image.sh \
-#     desktop_and_jetson/02_scikit.dockerfile \
-#     ${DOCKERHUB_ACCOUNT} \
-#     ${PLATFORM} \
-#     ${NGC_VERSION} \
-#     01_base \
-#     02_scikit
+./build_docker_image.sh \
+    desktop_and_jetson/02_scikit.dockerfile \
+    ${DOCKERHUB_ACCOUNT} \
+    ${PLATFORM} \
+    ${NGC_VERSION} \
+    01_base \
+    02_scikit
 
 echo ""
 echo "${ECHO_PREFIX} Building 03_fiftyone..."
