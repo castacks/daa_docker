@@ -84,6 +84,8 @@ cd <scripts/>
     <mounted home folder>
 ```
 
+where the `<mounted home folder>` is discussed in detail in the [Adding the host user to an image](#adding-the-host-user-to-an-image) section.
+
 An concrete example could be
 
 ```bash
