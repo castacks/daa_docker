@@ -36,7 +36,7 @@ An example image tag could be
 ```
 yaoyuh/ngc_arm_daa:22.12_03_fiftyone
 ```
-which is an image for the Jetson device based on NGC PyTorch 22.12 and it provides necessary functions for [FiftyOne](https://voxel51.com/). Note that the `suffix` is only for documentation purposes. The user needs to look at the actual docker files to get a sense of what is in an image without running the image.
+which is an image for a Jetson device based on NGC PyTorch 22.12 and it provides necessary functions for [FiftyOne](https://voxel51.com/). Note that the `suffix` is only for documentation purposes. The user needs to look at the actual docker files to get a sense of what is in an image without running the image.
 
 [x86_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_x86_daa
 [arm_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_arm_daa
