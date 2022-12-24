@@ -31,7 +31,7 @@ yaoyuh/ngc_arm_daa:22.12_03_fiftyone
 ```
 which is an image for the Jetson device based on NGC PyTorch 22.12 and it provides necessary functions for [FiftyOne](https://voxel51.com/). Note that the `suffix` is only for documentation purposes. The user needs to look at the actual docker files to get a sense of what is in an image without running the image.
 
-[x86_repo]: https://abc.com
+[x86_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_x86_daa
 [arm_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_arm_daa
 [ngc_pytorch]: https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch
 
@@ -74,13 +74,11 @@ For a fresh start, it is recommended to manually remove the copied `<host user n
 
 # Building images locally #
 
-Two separate scripts are provided for building images locally for `x86` and `ARM` platforms. They are `build_x86_images.sh` and `build_arm_images.sh`. TThe reason for not providing a single script with options to choose the target platform is that the procedure of building images is still under development and it is not stable. Once we have a more stable/robust procedure, the scripts will be redesigned.
-
-To use any of the scripts, e.g. `build_arm_images.sh`, do
+To build the images locally, do
 
 ```bath
 cd <scripts/>
-./build_arm_images.sh \
+./build_images.sh \
     <Docker Hub account> \
     <NGC version> \
     <mounted home folder>
@@ -89,10 +87,10 @@ cd <scripts/>
 An concrete example could be
 
 ```bash
-./build_arm_images.sh yaoyuh 22.12 /home/airlab/Projects/daa/home_docker
+./build_images.sh yaoyuh 22.12 /home/airlab/Projects/daa/home_docker
 ```
 
-Several images will be built progressively. In case of a failure, the user can comment out some parts of the script, make necessary changes to the docker file and re-run again. Then previous successfully built images serve as warm start (base images) of the modified docker file. When the whole build procedure finishes, there will be an image with a `99_local` tag suffix. This is the final image that has the host user already added. The images built by the above example command are
+Several images will be built progressively. In case of a failure, the user can comment out some parts of the script, make necessary changes to the docker file and re-run again. Then previous successfully built images serve as warm start (base images) of the modified docker file. When the whole build procedure finishes, there will be an image with a `99_local` tag suffix. This is the final image that has the host user already added. The images built by the above example command on a Jetson device are
 
 ```
 REPOSITORY                          TAG                   IMAGE ID       CREATED        SIZE
@@ -112,13 +110,13 @@ First, perform a dry run.
 
 ```bash
 cd <scripts/>
-./remove_images.sh <Docker Hub account> <platform> <NGC version>
+./remove_images.sh <Docker Hub account> <NGC version>
 ```
 
-The following is an example
+The following is an example on a Jetson device.
 
 ```
-$ ./remove_images.sh yaoyuh arm 22.12   
+$ ./remove_images.sh yaoyuh 22.12   
 ====================================================
 Dry run by default. Use -c to confirm the deletion. 
 ====================================================
@@ -134,7 +132,7 @@ yaoyuh/ngc_arm_daa   22.12_01_base       ddcf0403d2ad   26 hours ago   14.4GB
 To confirm the deletion, add the `-c` option to the command line. (The HASH codes are example ones)
 
 ```
-$ ./remove_images.sh yaoyuh arm 22.12 -c
+$ ./remove_images.sh yaoyuh 22.12 -c
 Removing...
 REPOSITORY           TAG                 IMAGE ID       CREATED        SIZE
 yaoyuh/ngc_arm_daa   22.12_99_local      c81c29b3d17a   2 hours ago    15.1GB

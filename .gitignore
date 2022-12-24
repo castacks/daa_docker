@@ -3,4 +3,4 @@
 *.tar.gz
 .vscode/
 *.code-workspace
-
+scripts/*_local.sh
