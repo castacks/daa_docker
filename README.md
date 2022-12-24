@@ -27,7 +27,7 @@ This repo contains useful docker files and scripts for the Aircraft Detecion and
 __NOTE__: All the pre-built images have the `root` as the default user. This is not a good practice and it leads to issues when trying to give GUI support to a docker container. The user is encouraged to create a wrapper docker image based on any of the pre-built images and add an appropriate non-root user to the wrapper image. Please refer to the [Adding the host user to an image](#adding-the-host-user-to-an-image) section for more details.
 
 Pre-built images can be found in our Docker Hub repository for [x86][x86_repo] and [ARM][arm_repo] architectures. The convention of the image tag is `<Docker Hub account>`/ngc_`<platform>`\_daa:`<NGC version>`\_`<suffix>`. Where the placeholders are 
-- __Docker Hub account__: The account name of the Docker Hub.
+- __Docker Hub account__: A Docker Hub account name. This part could be any valid name if the images are built locally following the [Building images locally](#building-images-locally) section.
 - __platform__: Can be `x86` or `arm`. Use `arm` on Jetson devices.
 - __NGC version__: The version of the [NGC PyTorch image][ngc_pytorch] with out the `-py3` suffix. E.g., 22.12.
 - __suffix__: An ordered name showing the functions of the image.
@@ -91,7 +91,7 @@ cd <scripts/>
     <mounted home folder>
 ```
 
-where the `<mounted home folder>` is discussed in detail in the [Adding the host user to an image](#adding-the-host-user-to-an-image) section.
+where the `<mounted home folder>` is discussed in detail in the [Adding the host user to an image](#adding-the-host-user-to-an-image) section. As mentioned in the [Pre-built images](#pre-built-images) section, `<Docker Hub account>` could be any valid account name that best suits the user's needs.
 
 An concrete example could be
 
