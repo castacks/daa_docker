@@ -13,48 +13,50 @@
 
 # Introduction #
 
-This repo contains the useful docker files and scripts for the Aircraft Detecion and Avoidance project. You can find pre-built docker images, docker files, and helper scripts here. The docker usage targets both x86 (ordinary desktop CPU/GPU) and arm (aarch64, Jetson platforms) architectures.
+This repo contains useful docker files and scripts for the Aircraft Detecion and Avoidance project. You can find the pre-built docker images, docker files, and helper scripts here. The docker usage targets both x86 (ordinary desktop CPU/GPU) and ARM (aarch64, Jetson platforms) architectures.
 
 # Pre-built images #
 
-__NOTE__: All the pre-built images have the `root` as the default user. This is not a good practice and it leads to issues when trying to give GUI support to the docker container. The user is encouraged to create a wrapper docker image based on any of the pre-built images and add an appropriate non-root user to the wrapper docker image. Please refer to the "Adding the host user to an image" section for more details.
+__NOTE__: All the pre-built images have the `root` as the default user. This is not a good practice and it leads to issues when trying to give GUI support to a docker container. The user is encouraged to create a wrapper docker image based on any of the pre-built images and add an appropriate non-root user to the wrapper image. Please refer to the [Adding the host user to an image](#adding-the-host-user-to-an-image) section for more details.
 
-Pre-built images can be found at our [Docker Hub repository][dockerhub_repo]. The convention of the image tag is `<Docker Hub account>`/ngc_`<platform>`\_daa:`<NGC version>`\_`<suffix>`. Where the place holders are 
+Pre-built images can be found in our Docker Hub repository for [x86][x86_repo] and [ARM][arm_repo] architectures. The convention of the image tag is `<Docker Hub account>`/ngc_`<platform>`\_daa:`<NGC version>`\_`<suffix>`. Where the placeholders are 
 - __Docker Hub account__: The account name of the Docker Hub.
 - __platform__: Can be `x86` or `arm`. Use `arm` on Jetson devices.
-- __NGC version__: The version of the NGC image with out the `-py3` suffix. E.g. 22.12.
+- __NGC version__: The version of the [NGC PyTorch image][ngc_pytorch] with out the `-py3` suffix. E.g., 22.12.
 - __suffix__: An ordered name showing the functions of the image.
 
 An example image tag could be
 ```
 yaoyuh/ngc_arm_daa:22.12_03_fiftyone
 ```
-which is an image for the Jetson device based on NGC PyTorch 22.12 and it provides nesseary functions for [FiftyOne](https://voxel51.com/). Note that the `suffix` is only for documentation purpose. The user needs to look at the actual docker files to get a sense of what are in the image without running the image.
+which is an image for the Jetson device based on NGC PyTorch 22.12 and it provides necessary functions for [FiftyOne](https://voxel51.com/). Note that the `suffix` is only for documentation purposes. The user needs to look at the actual docker files to get a sense of what is in an image without running the image.
 
-[dockerhub_repo]: https://abc.com
+[x86_repo]: https://abc.com
+[arm_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_arm_daa
+[ngc_pytorch]: https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch
 
 # Scripts for creating docker containers #
 
-__NOTE__: It is strongly recommended to follow the "Adding the host user to an image" section to create a wrapper docker image for working with the scripts provided here.
+__NOTE__: It is strongly recommended to follow the [Adding the host user to an image](#adding-the-host-user-to-an-image) section to create a wrapper docker image for working with the scripts provided here.
 
-In the `scripts` folder, there are two script files for starting a docker container for development. Namely `starty_docker.sh` and `start_docker_x.sh`, with the `_x` one being used for GUI (X server) support.
+In the `scripts` folder, there are two script files for starting a development docker container. Namely `start_docker.sh` and `start_docker_x.sh`, where `_x` means GUI (X server) support.
 
-To use these scripts, it is recommended to make a copy of a script and modify the necessary arguments for the `docker run` command. One important detail is that these scripts assume that the `home` folder of the user inside the docker container is mounted from outside. This makes things easier for working with tools like [Wandb][wandburl] where user login information is saved to and retreived from the `home` folder by default. E.g., when working with [Wandb][wandburl], the user won't need to login manually every time the `wandb.login()` is executed because the necessary credentials are saved under the `home` folder. If the docker image is built locally by following the "Building images locally" section or a wrapper image is created by following the "Adding the host user to an image" section, the initial content of the `home` folder of the image is automatically copied to the host. Refer to these sections for more details.
+To use these scripts, it is recommended to make a copy of a script and modify the necessary arguments for the `docker run` command. One important detail is that these scripts assume that the `home` folder of the user inside the docker container is mounted from outside. This makes things easier for working with tools like [Wandb][wandburl] where user login information is saved to and retrieved from the `home` folder by default. E.g., when working with [Wandb][wandburl], the user won't need to log in manually every time the `wandb.login()` is executed because the necessary credentials are saved under the `home` folder that is mounted externally. If a docker image is built locally by following the [Building images locally](#building-images-locally) section or a wrapper image is created by following the [Adding the host user to an image](#adding-the-host-user-to-an-image) section, the initial content of the `home` folder of the image is automatically copied to the host. Refer to these sections for more details.
 
 [wandburl]: https://docs.wandb.ai/
 
-To start a docker conatiner and enter it immediately, use the following command
+To start a docker container and enter it immediately, use the following command
 
 ```bash
 cd <scripts/>
 ./start_docker.sh <docker image with tag>
 ```
 
-The conatiner created by these scripts are not got removed automatically. The user need to do `docker rm` before running the script with the same image tag.
+The container created by these scripts does not get removed automatically. The user needs to do `docker rm` before running the script with the same image tag.
 
 # Adding the host user to an image #
 
-It is recommended to create a wrapper image and add the host user to the wrapper image. This has several benefits:
+It is recommended to create a wrapper image and add the host user to it. This has several benefits:
 - No file permission issues in and out of the container.
 - Friendly to GUI-enabled applications.
 - Provides an extra layer of security such that the user won't accidentally change or delete mounted host files.
@@ -66,13 +68,13 @@ cd <scripts/>
 ./add_user_2_image.sh <input image tag> <new/wrapper image tag> <parent directory for copying the home folder>
 ```
 
-where the last argument is a directory uner it the ENTIRE `/home/<host user name>` is copied AS A WHOLE object. This means that there will be a new folder with the name of `<host user name>` under the `<parent directory for copying the home folder>`. Be very careful about this behavior and do not confuse it with the actual `home` folder of the host.
+where the last argument is a directory under it the ENTIRE `/home/<host user name>` is copied AS A WHOLE object. This means that there will be a new folder with the name of `<host user name>` under the `<parent directory for copying the home folder>`. Be very careful about this behavior and do not confuse it with the actual `home` folder of the host.
 
-For a fresh start, it is recommended to manually remove the `<host user name>` directory before running the `add_user_2_image.sh` script.
+For a fresh start, it is recommended to manually remove the copied `<host user name>` directory before running the `add_user_2_image.sh` script.
 
 # Building images locally #
 
-Two separete scripts are provided for building images locally for `x86` and `arm` platforms. They are `build_x86_images.sh` and `build_arm_images.sh`. The reason for not providing a single script with options to choose platform is that building images is still under development and the procedures are not stable. Once we have a more stable/robust procedure, the scripts will be redesigned.
+Two separate scripts are provided for building images locally for `x86` and `ARM` platforms. They are `build_x86_images.sh` and `build_arm_images.sh`. TThe reason for not providing a single script with options to choose the target platform is that the procedure of building images is still under development and it is not stable. Once we have a more stable/robust procedure, the scripts will be redesigned.
 
 To use any of the scripts, e.g. `build_arm_images.sh`, do
 
@@ -90,7 +92,7 @@ An concrete example could be
 ./build_arm_images.sh yaoyuh 22.12 /home/airlab/Projects/daa/home_docker
 ```
 
-Several images will be built progressively. In case of a failure, the user can comment out some parts of the script, make necessary changes to the docker file and re-run again. Then previously successfully built images serve as warm start (base images) of the modified docker file. If the whole build procedure is finished, then there will be an image with a `99_local` suffix in the tag. This is the final image that has the host user already added. The images built by the above example command are
+Several images will be built progressively. In case of a failure, the user can comment out some parts of the script, make necessary changes to the docker file and re-run again. Then previous successfully built images serve as warm start (base images) of the modified docker file. When the whole build procedure finishes, there will be an image with a `99_local` tag suffix. This is the final image that has the host user already added. The images built by the above example command are
 
 ```
 REPOSITORY                          TAG                   IMAGE ID       CREATED        SIZE
@@ -102,11 +104,11 @@ yaoyuh/ngc_arm_daa                  22.12_01_base         ddcf0403d2ad   26 hour
 
 # Remove a series of images based on NGC version #
 
-__NOTE__: Use with causion.
+__NOTE__: Use with caution.
 
-When a newer NGC version is available, we can remove a series of images based on an old NGC version by the `remove_images.sh` script. 
+When a newer NGC version is available, we can remove a series of images that are based on an old NGC version by the `remove_images.sh` script. 
 
-First perform a dry run.
+First, perform a dry run.
 
 ```bash
 cd <scripts/>
