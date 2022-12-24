@@ -3,6 +3,7 @@
 
 - [Docker for DAA](#docker-for-daa)
 - [Introduction](#introduction)
+- [Major packages](#major-packages)
 - [Pre-built images](#pre-built-images)
 - [Scripts for creating docker containers](#scripts-for-creating-docker-containers)
 - [Adding the host user to an image](#adding-the-host-user-to-an-image)
@@ -14,6 +15,12 @@
 # Introduction #
 
 This repo contains useful docker files and scripts for the Aircraft Detecion and Avoidance project. You can find the pre-built docker images, docker files, and helper scripts here. The docker usage targets both x86 (ordinary desktop CPU/GPU) and ARM (aarch64, Jetson platforms) architectures.
+
+# Major packages #
+
+| NGC version | CUDA | Python | PyTorch          | Torch-TensorRT | ROS |
+|-------------|------|--------|------------------|----------------|-----|
+| 22.12       | 11.8 | 3.8.10 | 1.14.0a0+410ce96 | 1.3.0a0        |     |
 
 # Pre-built images #
 
