@@ -24,6 +24,7 @@ RUN pip3 install --no-cache-dir \
 	seaborn \
 	geographiclib \
 	filterpy \
+	natsort \
 	wandb
 	
 # Entrypoint command
