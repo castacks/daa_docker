@@ -28,7 +28,8 @@ RUN pip3 install --no-cache-dir \
 	seaborn \
 	geographiclib \
 	filterpy \
-	natsort
+	natsort \
+	kornia
 
 # Refer to https://forums.developer.nvidia.com/t/error-importerror-usr-lib-aarch64-linux-gnu-libgomp-so-1-cannot-allocate-memory-in-static-tls-block-i-looked-through-available-threads-already/166494/5
 ENV LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0

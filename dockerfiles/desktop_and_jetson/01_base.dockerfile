@@ -25,6 +25,7 @@ RUN pip3 install --no-cache-dir \
 	geographiclib \
 	filterpy \
 	natsort \
+	kornia \
 	wandb
 	
 # Entrypoint command
