@@ -163,6 +163,14 @@ Untagged: yaoyuh/ngc_arm_daa:22.12_01_base
 Deleted: sha256:ddcf0403d2ad2190bfca1ef4b8d0987f6483e3e8a93de65dd0a3a7ab49caccbd
 ```
 
+Sometimes the above command only untags the images but does not remove the files from the filesystem. Use
+
+```bash
+docker system prune
+```
+
+to remove the files. Use this command with caution because it might remove other things. Please checkout the offical documentation of [docker system prune](https://docs.docker.com/engine/reference/commandline/system_prune/) for more details.
+
 # Who to talk to #
 
 Please create GitHub issues if you find any problems.
