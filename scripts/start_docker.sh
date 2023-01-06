@@ -2,16 +2,16 @@
 
 # Detect the system architecture.
 UNAME=$(uname -m)
-if [ "$UNAME" == "x86_64" ]; then
+if [ "$UNAME" = "x86_64" ]; then
     ARCH="x86"
-elif [ "$UNAME" == "aarch64" ]; then
+elif [ "$UNAME" = "aarch64" ]; then
     ARCH="arm"
 else
     echo "Unsupported architecture: $UNAME"
     exit 1
 fi
 
-if [ "${ARCH}" == "arm" ]; then
+if [ "${ARCH}" = "arm" ]; then
     DOCKER_RUN_NVIDIA="--runtime nvidia"
 else
     DOCKER_RUN_NVIDIA="--gpus all"
