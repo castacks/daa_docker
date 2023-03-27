@@ -6,170 +6,96 @@
 - [Major packages](#major-packages)
 - [Pre-built images](#pre-built-images)
 - [Scripts for creating docker containers](#scripts-for-creating-docker-containers)
-- [Adding the host user to an image](#adding-the-host-user-to-an-image)
 - [Building images locally](#building-images-locally)
-- [Remove a series of images based on NGC version](#remove-a-series-of-images-based-on-ngc-version)
+- [Remove a series of images](#remove-a-series-of-images)
 - [Who to talk to](#who-to-talk-to)
   - [Point of contact:](#point-of-contact)
 
 # Introduction #
 
-This repo contains useful docker files and scripts for the Aircraft Detecion and Avoidance project. You can find the pre-built docker images, docker files, and helper scripts here. The docker usage targets both x86 (ordinary desktop CPU/GPU) and ARM (aarch64, Jetson platforms) architectures.
+This repo contains useful docker files and scripts for the Aircraft Detecion and Avoidance project. You can find the pre-built docker images, docker files, and helper scripts here. The docker usage targets Jetson AGX Orin architectures.
 
 # Major packages #
 
-| NGC version | CUDA | Python | PyTorch          | Torch-TensorRT | ROS |
+| Base Image | CUDA | Python | PyTorch          | Torch-TensorRT | ROS |
 |-------------|------|--------|------------------|----------------|-----|
-| 22.12       | 11.8 | 3.8.10 | 1.14.0a0+410ce96 | 1.3.0a0        |     |
+| nvcr.io/nvidia/l4t-pytorch:r35.1.0-pth1.12-py3       | 11.7 | 3.8.10 | 1.12 | release1.1        |  ROS2   |
 
 # Pre-built images #
 
-__NOTE__: All the pre-built images have the `root` as the default user. This is not a good practice and it leads to issues when trying to give GUI support to a docker container. The user is encouraged to create a wrapper docker image based on any of the pre-built images and add an appropriate non-root user to the wrapper image. Please refer to the [Adding the host user to an image](#adding-the-host-user-to-an-image) section for more details.
+__NOTE__: All the pre-built images have the `root` as the default user. This is not a good practice and it leads to issues when trying to give GUI support to a docker container. The user is encouraged to create a wrapper docker image based on any of the pre-built images and add an appropriate non-root user to the wrapper image. 
 
-Pre-built images can be found in our Docker Hub repository for [x86][x86_repo] and [ARM][arm_repo] architectures. The convention of the image tag is `<Docker Hub account>`/ngc_`<platform>`\_daa:`<NGC version>`\_`<suffix>`. Where the placeholders are 
+```
+sudo usermod -aG docker airlab # replace airlab with your user name.
+# need to reboot to take effect
+
+cat /etc/group
+```
+
+
+Pre-built images can be found in our Docker Hub repository for [ARM][arm_repo] architectures. The convention of the image tag is `<Docker Hub account>`/`<platform>`\_daa:`<revision version>`\_`<suffix>`. Where the placeholders are 
 - __Docker Hub account__: A Docker Hub account name. This part could be any valid name if the images are built locally following the [Building images locally](#building-images-locally) section.
-- __platform__: Can be `x86` or `arm`. Use `arm` on Jetson devices.
-- __NGC version__: The version of the [NGC PyTorch image][ngc_pytorch] with out the `-py3` suffix. E.g., 22.12.
+- __platform__: l4t for Jetson devices.
 - __suffix__: An ordered name showing the functions of the image.
 
 An example image tag could be
 ```
-yaoyuh/ngc_arm_daa:22.12_03_fiftyone
+theairlab/l4t-daa:03_ros2
 ```
-which is an image for a Jetson device based on NGC PyTorch 22.12 and it provides necessary functions for [FiftyOne](https://voxel51.com/). Note that the `suffix` is only for documentation purposes. The user needs to look at the actual docker files to get a sense of what is in an image without running the image.
 
-[x86_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_x86_daa
-[arm_repo]: https://hub.docker.com/repository/docker/yaoyuh/ngc_arm_daa
-[ngc_pytorch]: https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch
+[arm_repo]: https://hub.docker.com/layers/theairlab/l4t-daa/03_ros2/images/sha256-eca3c98f16887226c49d0f1812aa9790ebff9f79c05c42479d509022324f40db?context=repo
 
 # Scripts for creating docker containers #
 
-__NOTE__: It is strongly recommended to follow the [Adding the host user to an image](#adding-the-host-user-to-an-image) section to create a wrapper docker image for working with the scripts provided here.
-
-In the `scripts` folder, there are two script files for starting a development docker container. Namely `start_docker.sh` and `start_docker_x.sh`, where `_x` means GUI (X server) support.
-
-To use these scripts, it is recommended to make a copy of a script and modify the necessary arguments for the `docker run` command. One important detail is that these scripts assume that the `home` folder of the user inside the docker container is mounted from outside. This makes things easier for working with tools like [Wandb][wandburl] where user login information is saved to and retrieved from the `home` folder by default. E.g., when working with [Wandb][wandburl], the user won't need to log in manually every time the `wandb.login()` is executed because the necessary credentials are saved under the `home` folder that is mounted externally. If a docker image is built locally by following the [Building images locally](#building-images-locally) section or a wrapper image is created by following the [Adding the host user to an image](#adding-the-host-user-to-an-image) section, the initial content of the `home` folder of the image is automatically copied to the host. Refer to these sections for more details.
-
-[wandburl]: https://docs.wandb.ai/
 
 To start a docker container and enter it immediately, use the following command
 
 ```bash
-cd <scripts/>
-./start_docker.sh <docker image with tag>
+xhost + 
+
+docker run -it --rm --runtime nvidia --ulimit memlock=-1 --ulimit stack=67108864 --net=host --ipc=host --pid=host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v /data:/data theairlab/l4t-daa:03_ros2
+
 ```
+Here, if you need to use opencv to visualize images in docker, "xhost +" and "-v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY" would enable it;
+
+ -v arguments mounts the /data on local machine to the docker, modify it refer to you code folder for accessing data;
 
 The container created by these scripts does not get removed automatically. The user needs to do `docker rm` before running the script with the same image tag.
 
-# Adding the host user to an image #
 
-It is recommended to create a wrapper image and add the host user to it. This has several benefits:
-- No file permission issues in and out of the container.
-- Friendly to GUI-enabled applications.
-- Provides an extra layer of security such that the user won't accidentally change or delete mounted host files.
-
-A dedicated script, `add_user_2_image.sh`, is provided to help to add the host user to an image. The usage is
-
-```bash
-cd <scripts/>
-./add_user_2_image.sh <input image tag> <new/wrapper image tag> <parent directory for copying the home folder>
-```
-
-where the last argument is a directory under it the ENTIRE `/home/<host user name>` is copied AS A WHOLE object. This means that there will be a new folder with the name of `<host user name>` under the `<parent directory for copying the home folder>`. Be very careful about this behavior and do not confuse it with the actual `home` folder of the host.
-
-For a fresh start, it is recommended to manually remove the copied `<host user name>` directory before running the `add_user_2_image.sh` script.
 
 # Building images locally #
 
 To build the images locally, do
 
-```bath
-cd <scripts/>
-./build_images.sh \
-    <Docker Hub account> \
-    <NGC version> \
-    <mounted home folder>
-```
-
-where the `<mounted home folder>` is discussed in detail in the [Adding the host user to an image](#adding-the-host-user-to-an-image) section. As mentioned in the [Pre-built images](#pre-built-images) section, `<Docker Hub account>` could be any valid account name that best suits the user's needs.
-
-An concrete example could be
-
 ```bash
-./build_images.sh yaoyuh 22.12 /home/airlab/Projects/daa/home_docker
-```
+cd Torch-TensorRT
+docker build -t theairlab/l4t-torch-tensorrt:r35.1.0-pth1.12-ttrt-release-1.1  -f docker/Dockerfile.l4t --build-arg BASE=r35.1.0-pth1.12 .
 
-Several images will be built progressively. In case of a failure, the user can comment out some parts of the script, make necessary changes to the docker file and re-run again. Then previous successfully built images serve as warm start (base images) of the modified docker file. When the whole build procedure finishes, there will be an image with a `99_local` tag suffix. This is the final image that has the host user already added. The images built by the above example command on a Jetson device are
+cd ..
+docker build -t theairlab/l4t-torch-tensorrt:01 - < /data/daa_docker_new/requirements.dockerfile --build-arg base_image=theairlab/l4t-torch-tensorrt:r35.1.0-pth1.12-ttrt-release-1.1
 
-```
-REPOSITORY                          TAG                   IMAGE ID       CREATED        SIZE
-yaoyuh/ngc_arm_daa                  22.12_99_local        c81c29b3d17a   2 hours ago    15.1GB
-yaoyuh/ngc_arm_daa                  22.12_03_fiftyone     30b6524183b2   2 hours ago    15.1GB
-yaoyuh/ngc_arm_daa                  22.12_02_scikit       80998a4cc6df   26 hours ago   14.4GB
-yaoyuh/ngc_arm_daa                  22.12_01_base         ddcf0403d2ad   26 hours ago   14.4GB
-```
-
-# Remove a series of images based on NGC version #
-
-__NOTE__: Use with caution.
-
-When a newer NGC version is available, we can remove a series of images that are based on an old NGC version by the `remove_images.sh` script. 
-
-First, perform a dry run.
-
-```bash
-cd <scripts/>
-./remove_images.sh <Docker Hub account> <NGC version>
-```
-
-The following is an example on a Jetson device.
 
 ```
-$ ./remove_images.sh yaoyuh 22.12   
-====================================================
-Dry run by default. Use -c to confirm the deletion. 
-====================================================
+We build it for two steps.
+- In the first step, we build a docker for the torch-tensorrt, change the -t argunments to the name you use based on the format of `<Docker Hub account>`/`<image name>`:`<tag>`, this will build the torch-tensorrt docker; 
+- the second step is to install the required packages for the daa code to run properly, replace `theairlab/l4t-torch-tensorrt:r35.1.0-pth1.12-ttrt-release-1.1` to the name you have for the torch-tensorrt docker image, -t argument still will give the newly build docker a name, which can be run in [Scripts for creating docker containers](#scripts-for-creating-docker-containers)
 
-The following images will be removed once -c option is used.
-REPOSITORY           TAG                 IMAGE ID       CREATED        SIZE
-yaoyuh/ngc_arm_daa   22.12_99_local      c81c29b3d17a   2 hours ago    15.1GB
-yaoyuh/ngc_arm_daa   22.12_03_fiftyone   30b6524183b2   2 hours ago    15.1GB
-yaoyuh/ngc_arm_daa   22.12_02_scikit     80998a4cc6df   26 hours ago   14.4GB
-yaoyuh/ngc_arm_daa   22.12_01_base       ddcf0403d2ad   26 hours ago   14.4GB
-```
 
-To confirm the deletion, add the `-c` option to the command line. (The HASH codes are example ones)
+
+Images will be built progressively. In case of a failure, the user can comment out some parts of the script, make necessary changes to the docker file and re-run again. Then previous successfully built images serve as warm start (base images) of the modified docker file. The images built by the above example command on a Jetson device are
 
 ```
-$ ./remove_images.sh yaoyuh 22.12 -c
-Removing...
-REPOSITORY           TAG                 IMAGE ID       CREATED        SIZE
-yaoyuh/ngc_arm_daa   22.12_99_local      c81c29b3d17a   2 hours ago    15.1GB
-yaoyuh/ngc_arm_daa   22.12_03_fiftyone   30b6524183b2   2 hours ago    15.1GB
-yaoyuh/ngc_arm_daa   22.12_02_scikit     80998a4cc6df   26 hours ago   14.4GB
-yaoyuh/ngc_arm_daa   22.12_01_base       ddcf0403d2ad   26 hours ago   14.4GB
-Untagged: yaoyuh/ngc_arm_daa:22.12_99_local
-Deleted: sha256:c81c29b3d17abeb8cc6af4ae13fca4a689006382e88138852cd0828d1614792d
-Deleted: sha256:de7e3dbb9f8dd155c68603ce6c980026a26de8b110eb73d517143a7867285e04
-...
-<lots of other sha256 codes>
-...
-Deleted: sha256:21ac1ba1456cb91c479068db1f9bf57101a7304f93d1aa04f64c0997f088a462
-Untagged: yaoyuh/ngc_arm_daa:22.12_03_fiftyone
-Deleted: sha256:30b6524183b20722489269aa6f182267ea165cb436026016dcba0536c0a6d07f
-Untagged: yaoyuh/ngc_arm_daa:22.12_02_scikit
-Deleted: sha256:80998a4cc6df26e1b0cc67342d48630ffa8862cc9cd2e2326e32657ae61224f4
-Untagged: yaoyuh/ngc_arm_daa:22.12_01_base
-Deleted: sha256:ddcf0403d2ad2190bfca1ef4b8d0987f6483e3e8a93de65dd0a3a7ab49caccbd
+REPOSITORY                     TAG                                IMAGE ID       CREATED        SIZE
+theairlab/l4t-torch-tensorrt   01                                 6b5886195467   21 hours ago   15.9GB
+theairlab/l4t-torch-tensorrt   r35.1.0-pth1.12-ttrt-release-1.1   aac85b74f56d   22 hours ago   12.9GB
+
 ```
 
-Sometimes the above command only untags the images but does not remove the files from the filesystem. Use
+# Remove a series of images #
 
-```bash
-docker system prune
-```
+__NOTE__: docker rmi `IMAGE ID`
 
-to remove the files. Use this command with caution because it might remove other things. Please checkout the offical documentation of [docker system prune](https://docs.docker.com/engine/reference/commandline/system_prune/) for more details.
 
 # Who to talk to #
 
@@ -177,4 +103,4 @@ Please create GitHub issues if you find any problems.
 
 ## Point of contact: ##
 
-Yaoyu Hu \<yaoyuh@andrew.cmu.edu\>
+Zelin Ye \<zeliny@andrew.cmu.edu\>
