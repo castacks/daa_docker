@@ -28,7 +28,6 @@ __NOTE__: All the pre-built images have the `root` as the default user. This is 
 ```
 sudo usermod -aG docker airlab # replace airlab with your user name.
 # need to reboot to take effect
-
 cat /etc/group
 ```
 
@@ -52,7 +51,6 @@ To start a docker container and enter it immediately, use the following command
 
 ```bash
 xhost + 
-
 docker run -it --rm --runtime nvidia --ulimit memlock=-1 --ulimit stack=67108864 --net=host --ipc=host --pid=host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v /data:/data theairlab/l4t-daa:03_ros2
 
 ```
@@ -77,7 +75,7 @@ docker build -t theairlab/l4t-torch-tensorrt:01 - < /data/daa_docker_new/require
 
 
 ```
-We build it for two steps.
+We build it in two steps.
 - In the first step, we build a docker for the torch-tensorrt, change the -t argunments to the name you use based on the format of `<Docker Hub account>`/`<image name>`:`<tag>`, this will build the torch-tensorrt docker; 
 - the second step is to install the required packages for the daa code to run properly, replace `theairlab/l4t-torch-tensorrt:r35.1.0-pth1.12-ttrt-release-1.1` to the name you have for the torch-tensorrt docker image, -t argument still will give the newly build docker a name, which can be run in [Scripts for creating docker containers](#scripts-for-creating-docker-containers)
 
